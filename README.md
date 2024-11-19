@@ -1,0 +1,2 @@
+# ADISE24_blokus_2020038_2020074
+Blokus implementation
