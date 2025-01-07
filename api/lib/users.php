@@ -5,18 +5,18 @@ ini_set('display_errors', 1);
 
 function authUser($username,$password): void{
 	global $conn;
+	$hashed_password = sha1($password);
 	$sql = 'select * from users where username=? and password=?';
 	$st = $conn->prepare($sql);
-	$st->bind_param('ss', $username, $password);
+	$st->bind_param('ss', $username, $hashed_password);
 	$st->execute();
 	$res = $st->get_result();
 	$r = $res->fetch_assoc();
 
-	if ($r['session_id'] == '') {
+	if (empty($r['session_id'])) {
 		http_response_code(401);
-		echo json_encode("Wrong credentials");
-		echo json_encode($username . ' ' . $password);
-	}else{
+		echo json_encode('Wrong credentials');
+	} else {
 		$_SESSION['TOKEN'] = $r["session_id"];
 		http_response_code(200);
 		echo json_encode('Successful Login');
@@ -26,18 +26,19 @@ function authUser($username,$password): void{
 
 function createUser(string $username,string $password): void{
 	global $conn;
+	$hashed_password = sha1($password);
 	$sql = 'select createUser(?,?)';
 	$st = $conn->prepare($sql);
-	$st->bind_param("ss",$username);
+	$st->bind_param("ss",$username,$hashed_password);
 	$st->execute();
 	$res = $st->get_result();
 	$s = $res->fetch_assoc();
 	if ($s['createUser(?,?)']){
 		http_response_code(201);
-		echo json_encode("User created");
-	}else{
+		echo json_encode("SUCCESS");
+	} else {
 		http_response_code(400);
-		echo json_encode("Could not create user");
+		echo json_encode("FAILURE");
 	}
 }
 
