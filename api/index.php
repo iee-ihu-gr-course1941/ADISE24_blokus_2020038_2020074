@@ -6,25 +6,32 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+require_once "lib/users.php";
+require_once "lib/rooms.php";
+require_once "lib/game.php";
+
 $requestURI = explode("/",$_SERVER["REQUEST_URI"]);
 $httpMethod = $_SERVER['REQUEST_METHOD'];
+//echo '<pre>';
+//print_r($requestURI);
+//echo '</pre>';
 
 switch ($requestURI[3]) {
 	case 'user':{
 		if ($requestURI[4]=='auth'){
-			echo json_encode("authenticate");
+			authUser($requestURI[5],$requestURI[6]);
 			break;
 		} else if ($requestURI[4]=="create"){
-			echo json_encode("create user");
+			createUser($requestURI[5],$requestURI[6]);
 			break;
 		} else if ($requestURI[4]=='info'){
-			echo json_encode("show info");
+			showUserInfo();
 			break;
-		} else if ($requestURI[4]=='test'){
+		} else if ($requestURI[4]=='lol'){
 			echo json_encode("hi");
 			break;
 		} else if ($requestURI[4]=='scoreboard'){
-			echo json_encode("show scoreboard");
+			getScoreboard();
 			break;
 	} else {
 			http_response_code(404);
@@ -32,13 +39,58 @@ switch ($requestURI[3]) {
 		}
 		break;
 	}
-	/*case 'rooms':
+	case 'game':
 	{
+		switch ($requestURI[4]) {
+			case 'state':
+			{
+				getState($requestURI[5]);
+				break;
+			}
+			default:
+			{
+				http_response_code(404);
+				echo json_encode("Not found.");
+				break;
+			}
+		}
 		break;
-	}*/
+	}
+	case "rooms": {
+		if ($requestURI[4]=='join'){
+			if (count($requestURI) == 6) {
+				joinRoom($requestURI[5], "");
+			} else {
+				joinRoom($requestURI[5], $requestURI[6]);
+			}
+			break;
+		} else if ($requestURI[4]=='info'){
+			getRooms();
+			break;
+		} else if ($requestURI[4]=='create'){
+			if (count($requestURI) == 5) {
+				createRoom("");
+			} else {
+				createRoom($requestURI[5]);
+			}
+			break;
+		} else {
+			http_response_code(404);
+			json_encode('Not found.');
+			break;
+		}
+	}
+	case "test": {
+		test();
+		break;
+	}
+	case "apitest": {
+		apitest();
+		break;
+	}
 	default:{
 		echo json_encode("Not found.");
-	http_response_code(404);
+		http_response_code(404);
 		break;
 	}
 }
