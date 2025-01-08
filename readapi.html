@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Game Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(20, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 1px;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            border: 1px solid #ddd;
+        }
+        .cell-0 {
+            background-color: black;
+        }
+        .cell-1 {
+            background-color: red;
+        }
+        .cell-2 {
+            background-color: green;
+        }
+        .cell-3 {
+            background-color: blue;
+        }
+        .cell-4 {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="board" class="board"></div>
+
+    <script>
+        async function fetchBoardData(roomId) {
+            const response = await fetch("https://users.iee.ihu.gr/~iee2020038/lamp/apitest");
+            const data = await response.json();
+            return data;
+        }
+
+        function renderBoard(board) {
+            const boardContainer = document.getElementById('board');
+            boardContainer.innerHTML = '';
+
+            board.forEach(row => {
+                row.forEach(cellValue => {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    switch (cellValue) {
+                        case 0:
+                            cell.classList.add('cell-0');
+                            break;
+                        case 1:
+                            cell.classList.add('cell-1');
+                            break;
+                        case 2:
+                            cell.classList.add('cell-2');
+                            break;
+                        case 3:
+                            cell.classList.add('cell-3');
+                            break;
+                        case 4:
+                            cell.classList.add('cell-4');
+                            break;
+                        default:
+                            cell.style.backgroundColor = '#fff';
+                            break;
+                    }
+                    boardContainer.appendChild(cell);
+                });
+            });
+        }
+
+        window.onload = async function() {
+            const roomId = 1;
+            try {
+                const boardData = await fetchBoardData(roomId);
+                renderBoard(boardData);
+            } catch (error) {
+                console.error('Error fetching board data:', error);
+            }
+        };
+    </script>
+
+</body>
+</html>
