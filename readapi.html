@@ -3,103 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Game Board</title>
+    <title>Blokus Pieces Display</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f4;
         }
+
+        /* Board style */
         .board {
             display: grid;
-            grid-template-columns: repeat(20, 30px);
-            grid-template-rows: repeat(20, 30px);
-            gap: 1px;
+            grid-template-columns: repeat(20, 30px); /* 20 columns */
+            grid-template-rows: repeat(20, 30px); /* 20 rows */
+            gap: 5px;
+            margin-top: 20px;
         }
-        .cell {
+
+        .board div {
             width: 30px;
             height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 12px;
             border: 1px solid #ddd;
+            background-color: white;
         }
-        .cell-0 {
-            background-color: black;
+
+        /* Styles for displaying pieces */
+        .blokus-piece {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            background-color: #eee;
+            cursor: pointer;
         }
-        .cell-1 {
-            background-color: red;
+
+        .blokus-piece .piece {
+            width: 30px;
+            height: 30px;
+            margin: 1px;
         }
-        .cell-2 {
-            background-color: green;
+
+        .filled {
+            background-color: blue; /* Change this to any color you want */
         }
-        .cell-3 {
-            background-color: blue;
+
+        .transparent {
+            background-color: transparent;
         }
-        .cell-4 {
-            background-color: yellow;
+
+        /* Container for pieces */
+        #blokus-pieces {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <h1>Blokus Game</h1>
+    <div class="board" id="board"></div>
 
-    <div id="board" class="board"></div>
+    <h2>Blokus Pieces</h2>
+    <div id="blokus-pieces"></div>
 
     <script>
-        async function fetchBoardData(roomId) {
-            const response = await fetch("https://users.iee.ihu.gr/~iee2020038/lamp/apitest");
-            const data = await response.json();
-            return data;
+        // Example pieces array (2D arrays)
+        const pieces = [
+            [[1]],
+            [[1, 1, 0], [0, 1, 0], [0, 1, 0], [0, 1, 1]],
+            [[1, 1], [1, 1]],
+            [[1, 0], [1, 1], [1, 0]]
+        ];
+
+        const board = document.getElementById('board');
+        const piecesContainer = document.getElementById('blokus-pieces');
+
+        // Display the board (20x20 grid)
+        for (let i = 0; i < 20; i++) {
+            for (let j = 0; j < 20; j++) {
+                const cell = document.createElement('div');
+                board.appendChild(cell);
+            }
         }
 
-        function renderBoard(board) {
-            const boardContainer = document.getElementById('board');
-            boardContainer.innerHTML = '';
+        // Display Blokus pieces below the board
+        pieces.forEach((piece, index) => {
+            const pieceDiv = document.createElement('div');
+            pieceDiv.classList.add('blokus-piece');
+            pieceDiv.draggable = true;
+            pieceDiv.dataset.pieceIndex = index;
 
-            board.forEach(row => {
-                row.forEach(cellValue => {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    switch (cellValue) {
-                        case 0:
-                            cell.classList.add('cell-0');
-                            break;
-                        case 1:
-                            cell.classList.add('cell-1');
-                            break;
-                        case 2:
-                            cell.classList.add('cell-2');
-                            break;
-                        case 3:
-                            cell.classList.add('cell-3');
-                            break;
-                        case 4:
-                            cell.classList.add('cell-4');
-                            break;
-                        default:
-                            cell.style.backgroundColor = '#fff';
-                            break;
+            piece.forEach(row => {
+                row.forEach(col => {
+                    const block = document.createElement('div');
+                    block.classList.add('piece');
+
+                    // Add color depending on the value in the piece
+                    if (col === 1) {
+                        block.classList.add('filled');
+                    } else {
+                        block.classList.add('transparent');
                     }
-                    boardContainer.appendChild(cell);
+
+                    pieceDiv.appendChild(block);
                 });
             });
+
+            pieceDiv.addEventListener('dragstart', handleDragStart);
+            piecesContainer.appendChild(pieceDiv);
+        });
+
+        let draggedPiece = null;
+
+        // Handle drag start event
+        function handleDragStart(event) {
+            draggedPiece = event.target;
+            event.dataTransfer.setData('text', draggedPiece.dataset.pieceIndex);
         }
 
-        window.onload = async function() {
-            const roomId = 1;
-            try {
-                const boardData = await fetchBoardData(roomId);
-                renderBoard(boardData);
-            } catch (error) {
-                console.error('Error fetching board data:', error);
-            }
-        };
-    </script>
+        // Define the board cell where the piece can be dropped
+        board.addEventListener('dragover', (event) => {
+            event.preventDefault();
+        });
 
+        // Handle drop event on the board
+        board.addEventListener('drop', (event) => {
+            event.preventDefault();
+
+            const pieceIndex = event.dataTransfer.getData('text');
+            const piece = pieces[pieceIndex];
+            const x = Math.floor(event.offsetX / 30);
+            const y = Math.floor(event.offsetY / 30);
+
+            // Check if the piece fits within the bounds of the board and if it's empty (0)
+            for (let i = 0; i < piece.length; i++) {
+                for (let j = 0; j < piece[i].length; j++) {
+                    if (piece[i][j] === 1) {
+                        const cell = board.children[(y + i) * 20 + (x + j)];
+                        if (cell && cell.classList.contains('filled')) {
+                            alert('Cannot place the piece here!');
+                            return; // If overlap or boundary issue, do not place the piece
+                        }
+                    }
+                }
+            }
+
+            // Place the piece on the board
+            for (let i = 0; i < piece.length; i++) {
+                for (let j = 0; j < piece[i].length; j++) {
+                    if (piece[i][j] === 1) {
+                        const cell = board.children[(y + i) * 20 + (x + j)];
+                        cell.classList.add('filled');
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
+
