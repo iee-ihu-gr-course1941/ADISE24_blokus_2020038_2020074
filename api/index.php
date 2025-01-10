@@ -21,16 +21,21 @@ $httpMethod = $_SERVER['REQUEST_METHOD'];
 switch ($requestURI[3]) {
 	case 'user':{
 		if ($requestURI[4]=='auth'){
+			if (count($requestURI) < 7) {
+				echo json_encode("Not enough arguments provided.");
+				exit();
+			}
 			authUser($requestURI[5],$requestURI[6]);
 			break;
 		} else if ($requestURI[4]=="create"){
+			if (count($requestURI) < 7) {
+				echo json_encode("Not enough arguments provided.");
+				exit();
+			}
 			createUser($requestURI[5],$requestURI[6]);
 			break;
 		} else if ($requestURI[4]=='info'){
 			showUserInfo();
-			break;
-		} else if ($requestURI[4]=='lol'){
-			echo json_encode("hi");
 			break;
 		} else if ($requestURI[4]=='scoreboard'){
 			getScoreboard();
@@ -46,37 +51,74 @@ switch ($requestURI[3]) {
 		switch ($requestURI[4]) {
 			case 'state':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				getState($requestURI[5]);
 				break;
 			}
 			case 'turn':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				getTurn($requestURI[5]);
 				break;
 			}
 			case 'pieces':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				getPieces($requestURI[5]);
 				break;
 			}
 			case 'pieceids':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				getPieceIDs($requestURI[5]);
 				break;
 			}
 			case 'players':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				getPlayers($requestURI[5]);
 				break;
 			}
 			case 'position':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				getPosition($requestURI[5]);
 				break;
 			}
 			case 'update_activity':
 			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
 				updateActivity($requestURI[5]);
+				break;
+			}
+			case 'scores':
+			{
+				if (count($requestURI) < 6) {
+					echo json_encode("Not enough arguments provided.");
+					exit();
+				}
+				calculateScores($requestURI[5]);
 				break;
 			}
 			case 'place':
@@ -84,7 +126,7 @@ switch ($requestURI[3]) {
 				if (count($requestURI) == 10) {
 					placePiece($requestURI[6], $requestURI[5], $requestURI[7],$requestURI[8],$requestURI[9]);
 				} else  {
-					echo json_encode("Piece code or room id not provided.");
+					echo json_encode("Wrong number of arguments were provided.");
 				}
 				break;
 			}
@@ -120,14 +162,6 @@ switch ($requestURI[3]) {
 			json_encode('Not found.');
 			break;
 		}
-	}
-	case "test": {
-		test();
-		break;
-	}
-	case "apitest": {
-		apitest();
-		break;
 	}
 	default:{
 		echo json_encode("Not found.");
