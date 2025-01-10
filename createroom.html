@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create and Join Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0398fc;
+            padding: 10px 20px;
+        }
+
+        nav .logo {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f0f0f0;
+        }
+
+        h1 {
+            color: #0398fc;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2em;
+        }
+
+        p {
+            font-size: 17px; 
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+        }
+
+        #container {
+            padding: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .password-input {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            margin-right: 1em;
+            border: 0px;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 14px;
+            width: 150px;
+        }
+        
+        .password-input::placeholder {
+            color: #888;
+        }
+
+        #button {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #button:hover {
+            background-color: #005f7f;
+        }
+
+        form {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 15px;
+          transition: background-color 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Blokus</div>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="createroom.html">Create room</a></li>
+            <li><a href="rooms.html">Available Rooms</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+        </ul>
+    </nav>
+
+    <h1>Create a room</h1>
+    <div id="container">
+    <p>Here you can create your own game room, where you'll get to play as blue.</p>
+    <p>Optionally, you can make your room private by adding password, this way only you and those you share the password with can join!</p>
+    <form id="create-room-form">
+        <input type="password" class="password-input" id="password" name="password" placeholder="Optional password">
+
+        <button type="submit" id="button">Create and Join</button>
+    </form>
+
+    <div id="result"></div>
+    </div>
+    <footer>&copy; 2020038 2020064</footer>
+
+    <script>
+        document.getElementById('button').onclick = async (event) => {
+            event.preventDefault(); 
+
+            const password = document.getElementById('password').value.trim();
+
+                let createApiUrl = `https://users.iee.ihu.gr/~iee2020038/lamp/rooms/create`;
+
+                if (password) {
+                    createApiUrl += `/${password}`;
+
+                }
+
+                const createResponse = await fetch(createApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const createResult = await createResponse.json();
+                console.log('Create Room Response:', createResult);
+
+                if (!createResponse.ok || !createResult) {
+                    alert('Error creating room!');
+                    return;
+                }
+
+                const roomId = createResult;
+
+                let joinApiUrl = `https://users.iee.ihu.gr/~iee2020038/lamp/rooms/join/${roomId}`;
+                if (password) {
+                    joinApiUrl += `/${password}`;
+
+                }
+
+                const joinResponse = await fetch(joinApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const joinResult = await joinResponse.json();
+                console.log('Join Room Response:', joinResult);
+
+                if (joinResponse.ok && joinResult) {
+                    if (joinResult.includes("player_") || joinResult === "Already joined.") {
+                        window.location.href = `https://users.iee.ihu.gr/~iee2020038/play.html?game=${roomId}`;
+                    } else {
+                        alert(joinResult);
+                    }
+                } else {
+                    alert('Error joining the room!');
+                }
+        };
+    </script>
+</body>
+</html>
+

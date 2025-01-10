@@ -167,7 +167,8 @@
     <nav>
         <div class="logo">Blokus</div>
         <ul>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="createroom.html">Create room</a></li>
             <li><a href="rooms.html">Available Rooms</a></li>
             <li><a href="leaderboard.html">Leaderboard</a></li>
         </ul>
@@ -213,17 +214,60 @@
 
 
                     // Join button
-                    const joinButton = document.createElement('button');
-                    joinButton.className = 'join-button';
-                    joinButton.className = room.status === 'full' ? 'join-button-greyed-out' : 'join-button';
-                    joinButton.textContent = 'Join';
-                    if (room.status !== 'full') {
-                        joinButton.onclick = () => {
-                            window.location.href = `https://users.iee.ihu.gr/~iee2020038/testpapi_6.html?game=${room.id}`;
-                        };
-                    } else {
-                        joinButton.disabled = true;
-                    }
+const joinButton = document.createElement('button');
+joinButton.className = room.status === 'full' ? 'join-button-greyed-out' : 'join-button';
+joinButton.textContent = 'Join';
+
+if (room.status !== 'full') {
+    joinButton.onclick = async () => {
+        try {
+            // Construct the API URL
+            let apiUrl = `https://users.iee.ihu.gr/~iee2020038/lamp/rooms/join/${room.id}`;
+            if (room.access === 'private') {
+                const passwordInput = roomElement.querySelector('.password-input');
+                if (passwordInput) {
+                    const password = passwordInput.value.trim();
+                    apiUrl += `/${password}`;
+                } else {
+                    alert('Please enter a password to join the private room.');
+                    return;
+                }
+            }
+    
+            // Make the API call to validate
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            // Parse the response as JSON
+            const result = await response.json();
+            console.log(result); // Debugging: Check the API response
+            console.log(apiUrl); // Debugging: Check the API response
+    
+            // Check the message property
+            if (result) {
+                if (result.includes("player_") || result === "Already joined.") {
+                    // Redirect to the game page
+                    window.location.href = `https://users.iee.ihu.gr/~iee2020038/play.html?game=${room.id}`;
+                } else {
+                    // Display the error message
+                    alert(result);
+                }
+            } else {
+                alert('Unexpected response format from the server.');
+            }
+        } catch (error) {
+            console.error('Error while joining the room:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
+    };
+
+} else {
+    joinButton.disabled = true;
+}
 
                     roomElement.appendChild(statusCircle);
                     roomElement.appendChild(roomInfo);

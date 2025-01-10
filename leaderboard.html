@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fc2828;
+            padding: 10px 20px;
+        }
+
+        nav .logo {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f0f0f0;
+        }
+
+        #container {
+            padding: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #fc2828;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        table {
+            font-size: 20px;
+            width: 50%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+	thead {
+	    color: black;
+	}
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 20px;
+            color: #888;
+        }
+
+        footer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Blokus</div>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="createroom.html">Create room</a></li>
+            <li><a href="rooms.html">Available Rooms</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+        </ul>
+    </nav>
+
+    <h1>Scoreboard</h1>
+    <div id="container">    
+    <div id="loading" class="loading"></div>
+
+    <table id="scoreboard" style="display: none;">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="scoreboard-body">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+    </div>
+    <footer>&copy; 2020038 2020064</footer>
+
+    <script>
+        // Function to fetch and display the scoreboard
+        async function fetchScoreboard() {
+            try {
+                const response = await fetch('https://users.iee.ihu.gr/~iee2020038/lamp/user/scoreboard');
+                const scoreboardData = await response.json();
+                console.log(scoreboardData); // Debugging: Check the API response
+
+                // Hide the loading message
+                document.getElementById('loading').style.display = 'none';
+
+                // Get the table body element
+                const scoreboardBody = document.getElementById('scoreboard-body');
+
+                // Populate the table with data
+                scoreboardData.forEach(player => {
+                    const row = document.createElement('tr');
+                    const usernameCell = document.createElement('td');
+                    const scoreCell = document.createElement('td');
+
+                    usernameCell.textContent = player.username;
+                    scoreCell.textContent = player.score;
+
+                    row.appendChild(usernameCell);
+                    row.appendChild(scoreCell);
+                    scoreboardBody.appendChild(row);
+                });
+
+                // Show the scoreboard table
+                document.getElementById('scoreboard').style.display = 'table';
+            } catch (error) {
+                console.error('Error fetching scoreboard data:', error);
+                document.getElementById('loading').textContent = 'Failed to load scoreboard. Please try again later.';
+            }
+        }
+
+        // Call the function to fetch and display the scoreboard
+        fetchScoreboard();
+    </script>
+
+</body>
+</html>
+

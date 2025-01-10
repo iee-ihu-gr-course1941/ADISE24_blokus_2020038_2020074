@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #0398fc;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2em;
+	}
+        p {
+            font-size: 17px; 
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+        }
+
+        #container {
+            padding: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            border-radius: 8px;
+        }
+
+        footer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .input {
+            background-color: #121212;
+            color: #f0f0f0;
+            margin-right: 1em;
+            border: 0px;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 14px;
+            width: 150px;
+        }
+        
+        .input::placeholder {
+            color: #888;
+        }
+
+        #button {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #button:hover {
+            background-color: #005f7f;
+        }
+
+        form {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 15px;
+          transition: background-color 0.3s ease;
+        }
+</style>
+</head>
+<body>
+    <h1>Sign Up</h1>
+    <div id="container">
+    <form id="signup-form">
+        <input type="text" class="input" id="username" name="username" placeholder="Username" required>
+        <br><br>
+
+        <input type="password" class="input" id="password" name="password" placeholder="Password" required>
+        <br><br>
+
+        <button id="button" type="submit">Sign Up</button>
+        <p>Already have an account? <a href="login.html">Login!</a></p>
+    </form>
+
+    <div id="error-message" style="color: red; display: none;"></div>
+    <div id="success-message" style="color: green; display: none;"></div>
+    </div>
+    <footer>&copy; 2020038 2020064</footer>
+
+    <script>
+        document.getElementById('signup-form').onsubmit = async (event) => {
+            event.preventDefault();  // Prevent the default form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Construct the API URL based on the given format
+                const apiUrl = `https://users.iee.ihu.gr/~iee2020038/lamp/user/create/${username}/${password}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'GET',  // Assuming the request is a GET request (adjust if needed)
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const result = await response.json();
+                console.log(result);  // Debugging: Check the API response
+
+                if (result == "User created") {
+                    // Show a success message and redirect to the login page
+                    document.getElementById('success-message').textContent = 'Account created successfully! You can now log in.';
+                    document.getElementById('success-message').style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';  // Redirect to login page after 3 seconds
+                    }, 3000);
+                } else {
+                    // Display error message from the API response
+                    document.getElementById('error-message').textContent = result.message || 'Sign up failed. Please try again.';
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error during sign up:', error);
+                document.getElementById('error-message').textContent = 'An unexpected error occurred. Please try again.';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>
+
