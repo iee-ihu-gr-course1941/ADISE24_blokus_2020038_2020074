@@ -76,8 +76,7 @@ switch ($requestURI[3]) {
 			}
 			case 'update_activity':
 			{
-				//updateActivity($requestURI[5]);
-				echo "update activity";
+				updateActivity($requestURI[5]);
 				break;
 			}
 			case 'place':
