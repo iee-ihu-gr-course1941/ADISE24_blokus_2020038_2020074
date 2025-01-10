@@ -94,7 +94,7 @@ create table if not exists boards (
 -- "
 drop function if exists createRoom;
 create function createRoom(session_id_param varchar(255), 
-						   password_param varchar(255)) 
+			   password_param varchar(255)) 
 returns int
 begin
 
@@ -109,7 +109,7 @@ begin
 	insert into rooms (player_a, password, turn_index, created_at)
 	values (username_a,
 			case when password_param is not null and password_param != '' 
-				 then password(password_param) 
+				 then password_param
 				 else null 
 			end,
 			1,
@@ -169,8 +169,11 @@ begin
 	select password into password_tmp
 	from rooms
 	where room_index = room_index_param limit 1;
+
+	SET password_param = TRIM(password_param);
+	SET password_tmp = TRIM(password_tmp);
 	if not (password_tmp = password_param)
-	   or not (password_tmp is NULL and password_param = '') then
+	   and not (password_tmp is NULL and password_param = '') then
 		return "Wrong password";
 	end if;
 
@@ -532,3 +535,79 @@ end$$
 
 DELIMITER ;
 
+DELIMITER $$
+
+drop procedure if exists updateActivity $$
+create procedure updateActivity(session_id_param varchar(255), room_id_param int)
+deterministic
+begin
+	declare username_val varchar(255);
+
+	-- retrieve username from session_id
+	select username
+	into username_val
+	from users
+	where session_id = session_id_param;
+
+	-- update the appropriate bitmask column
+	update rooms
+	set 
+		a_activity = case when player_a = username_val then current_timestamp else a_activity end,
+		b_activity = case when player_b = username_val then current_timestamp else b_activity end,
+		c_activity = case when player_c = username_val then current_timestamp else c_activity end,
+		d_activity = case when player_d = username_val then current_timestamp else d_activity end
+	where 
+		room_index = room_id_param
+		and (player_a = username_val
+			 or player_b = username_val
+			 or player_c = username_val
+			 or player_d = username_val);
+end$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+drop procedure if exists removePlayer$$
+
+create procedure removeplayer(username_param varchar(255), room_index_param int)
+begin
+    update rooms
+    set
+        player_a = case when player_a = username_param then null else player_a end,
+        player_b = case when player_b = username_param then null else player_b end,
+        player_c = case when player_c = username_param then null else player_c end,
+        player_d = case when player_d = username_param then null else player_d end,
+        a_activity = case when player_a = username_param then null else a_activity end,
+        b_activity = case when player_b = username_param then null else b_activity end,
+        c_activity = case when player_c = username_param then null else c_activity end,
+        d_activity = case when player_d = username_param then null else d_activity end
+    where
+        (player_a = username_param or player_b = username_param or player_c = username_param or player_d = username_param)
+        and room_index = room_index_param;
+end$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+drop procedure if exists updateScore$$
+create procedure updateScore(username_param varchar(255), score_param int)
+deterministic
+begin
+    declare current_top_score int;
+
+    select score
+    into current_top_score
+    from users
+    where username = username_param
+    limit 1;
+
+    if score_param > current_top_score then
+        update users
+        set score = score_param
+        where username = username_param;
+    end if;
+end$$
+
+DELIMITER ;
