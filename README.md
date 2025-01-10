@@ -1,98 +1,97 @@
 # ADISE24_blokus_2020038_2020074
-Blokus implementation
+Blokus implementation by Michail Konstantinos Dimopoulos & Konstantinos Koufoudakis.
+
+## features
+* Multiple players & games at the same time
+* Score counting & leaderboard
+* Fully-featured graphical UI
+* Inactivity detection & kicks
+* In-house account management
+* No plaintext password storage
+
+There are some known issues that were not fixed due to time contraints. You'll find them in the issues tab.
+
 # Game API Documentation
+
+A thin-API approached was followed to facilitate front-end development. This has led to some redundancy, but it has been minimized.
 
 ## **User Endpoints**
 
-### **User Info**
-`GET /user/info`
+`/user/info`
 Retrieves information about the authenticated user.
 
 ---
 
-### **Create User**
-`POST /user/create/${username}/${password}`
+`/user/create/${username}/${password}`
 Creates a new user with the given username and password.
 
 ---
 
-### **Scoreboard**
-`GET /user/scoreboard`
+`/user/scoreboard`
 Returns the leaderboard.
 
 ---
 
 ## **Game Endpoints**
 
-### **Game State**
-`GET /game/state/${gameid}`
+`/game/state/${gameid}`
 Retrieves the current state of the game board
 
 ---
 
-### **Current Turn**
-`GET /game/turn/${gameid}`
+`/game/turn/${gameid}`
 Returns the current turn number of the game.
 
 ---
 
-### **Players in Game**
-`GET /game/players/${gameid}`
+`/game/players/${gameid}`
 Lists all players in the game.
 
 ---
 
-### **Available piece arrays**
-`GET /game/pieces/${gameid}`
+`/game/pieces/${gameid}`
 Lists the 2D arrays of available pieces
 
 ---
 
-### **Available piece IDs**
-`GET /game/pieceids/${gameid}`
+`/game/pieceids/${gameid}`
 Lists the IDs of available pieces.
 
 ---
 
-### **Current color & position**
-`GET /game/position/${gameid}`
+`/game/position/${gameid}`
 Returns color & position
 
 ---
 
-### **Update activity**
-`GET /game/update_activity/${gameid}`
+`/game/update_activity/${gameid}`
 Updates activity timestamp
 
 ---
 
-### **Place a Piece**
-`POST /game/place/${gameid}/${pieceid}/${x}/${y}/${r}`
+`/game/place/${gameid}/${pieceid}/${x}/${y}/${r}`
 Places a piece on the board.
 
 ---
 
-### **Game Scores**
-`GET /game/scores/${gameid}`
+`/game/scores/${gameid}`
 Retrieves the scores of the players in the game.
 
 ---
 
 ## **Room Endpoints**
 
-### **Join Room**
-`POST /rooms/join/${roomid}/${password?}`
+`/rooms/join/${roomid}/${password?}`
 Joins a room (password optional).
 
 ---
 
-### **Create Room**
-`POST /rooms/create/${password?}`
+`/rooms/create/${password?}`
 Creates a new room (password optional).
 
 ---
 
-### **Room Info**
-`GET /rooms/info`
+`/rooms/info`
 Lists all available rooms.
+
 
