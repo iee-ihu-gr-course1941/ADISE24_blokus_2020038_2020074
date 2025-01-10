@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+        }
+
+        nav .logo {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #f0f0f0;
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2em;
+        }
+
+        #room-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+            background: #1e1e1e;
+            border-radius: 8px;
+        }
+
+        .room {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            transition: background-color 0.3s ease;
+        }
+
+        .room:last-child {
+            border-bottom: none;
+        }
+
+        .room:hover {
+            background-color: #2a2a2a;
+        }
+
+        .status-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .status-full {
+            background-color: red;
+        }
+
+        .status-not-full {
+            background-color: green;
+        }
+
+        .room-info {
+            flex-grow: 1;
+        }
+
+        .room-info p {
+            margin: 0;
+            color: #e0e0e0;
+        }
+
+        .room-info .room-id {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .password-input {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            margin-right: 1em;
+            border: 0px;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 14px;
+            width: 150px;
+        }
+        
+        .password-input::placeholder {
+            color: #888;
+        }
+
+        .join-button {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .join-button:hover {
+            background-color: #005f7f;
+        }
+
+        .join-button-greyed-out {
+            background-color: #474747;
+            color: #949494;
+            border: none;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo">Blokus</div>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="rooms.html">Available Rooms</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <h1>Available Rooms</h1>
+    <div id="room-container"></div>
+    <footer>&copy; 2020038 2020064</footer>
+
+    <script>
+        async function fetchRooms() {
+            try {
+                // get the room data
+                const response = await fetch('https://users.iee.ihu.gr/~iee2020038/lamp/rooms/info');
+                const rooms = await response.json();
+
+                const container = document.getElementById('room-container');
+
+                rooms.forEach(room => {
+                    const roomElement = document.createElement('div');
+                    roomElement.className = 'room';
+
+                    // status circle
+                    const statusCircle = document.createElement('div');
+                    statusCircle.className = 'status-circle';
+                    statusCircle.classList.add(room.status === 'full' ? 'status-full' : 'status-not-full');
+
+                    // room info
+                    const roomInfo = document.createElement('div');
+                    roomInfo.className = 'room-info';
+
+                    const roomId = document.createElement('p');
+                    roomId.className = 'room-id';
+                    roomId.textContent = `Room ID: ${room.id}`;
+
+                    const roomDetails = document.createElement('p');
+                    roomDetails.textContent = `Created At: ${room.created_at}, Access: ${room.access}`;
+
+                    roomInfo.appendChild(roomId);
+                    roomInfo.appendChild(roomDetails);
+
+
+
+                    // Join button
+                    const joinButton = document.createElement('button');
+                    joinButton.className = 'join-button';
+                    joinButton.className = room.status === 'full' ? 'join-button-greyed-out' : 'join-button';
+                    joinButton.textContent = 'Join';
+                    if (room.status !== 'full') {
+                        joinButton.onclick = () => {
+                            window.location.href = `https://users.iee.ihu.gr/~iee2020038/testpapi_6.html?game=${room.id}`;
+                        };
+                    } else {
+                        joinButton.disabled = true;
+                    }
+
+                    roomElement.appendChild(statusCircle);
+                    roomElement.appendChild(roomInfo);
+                    if (room.access === 'private') {
+                        const passwordInput = document.createElement('input');
+                        passwordInput.type = 'password';
+                        passwordInput.placeholder = 'Enter password';
+                        passwordInput.className = 'password-input';
+                        roomElement.appendChild(passwordInput);
+                    }
+                    roomElement.appendChild(joinButton);
+
+                    // Append
+                    container.appendChild(roomElement);
+                });
+            } catch (error) {
+                console.error('Error fetching room data:', error);
+                const container = document.getElementById('room-container');
+                container.textContent = 'Failed to load rooms. Please try again later.';
+            }
+        }
+
+        fetchRooms();
+    </script>
+</body>
+</html>
+
