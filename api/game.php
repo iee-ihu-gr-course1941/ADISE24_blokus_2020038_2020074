@@ -430,6 +430,43 @@ function getRoomsArbitrary($room_id, $nstr) {
 	}
 }
 
+function updateActivity($room_id) {
+	global $conn;
+
+	$current_time = date('Y-m-d H:i:s');
+	$timeout_limit = '180';
+
+	/* update activity */
+	$sql = 'call updateActivity(?,?)';
+	$st = $conn->prepare($sql);
+	$st->bind_param('si', $_SESSION['TOKEN'], $room_id);
+	$st->execute();
+	$st->close();
+
+	$sql_check = 'SELECT checkTimeouts(?, ?) AS timed_out_players';
+	$st_check = $conn->prepare($sql_check);
+	$st_check->bind_param('ii', $room_id, $timeout_limit);
+	$st_check->execute();
+	$st_check->bind_result($timed_out_players);
+	$st_check->fetch();
+	$st_check->close();
+	
+	/* check activity */
+	if (!empty($timed_out_players)) {
+		$timed_out_array = explode(',', $timed_out_players);
+		$messages = [];
+		
+		foreach ($timed_out_array as $player) {
+			$player = ltrim($player);
+			$messages[] = "$player has been kicked due to inactivity.";
+		}
+		
+		echo json_encode($messages);
+	} else {
+		echo json_encode("none");
+	}
+}
+
 function updateState($room_id, $n, $state): void {
 	global $conn;
 	$state = 1;
