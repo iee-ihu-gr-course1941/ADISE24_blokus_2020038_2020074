@@ -1,6 +1,8 @@
 <?php
 
 header("Content-type: application/json; charset=UTF-8");
+//require_once "lib/ErrorHandler.php";
+//set_exception_handler("ErrorHandler::handleException");
 session_start();
 
 error_reporting(E_ALL);
@@ -45,6 +47,46 @@ switch ($requestURI[3]) {
 			case 'state':
 			{
 				getState($requestURI[5]);
+				break;
+			}
+			case 'turn':
+			{
+				getTurn($requestURI[5]);
+				break;
+			}
+			case 'pieces':
+			{
+				getPieces($requestURI[5]);
+				break;
+			}
+			case 'pieceids':
+			{
+				getPieceIDs($requestURI[5]);
+				break;
+			}
+			case 'players':
+			{
+				getPlayers($requestURI[5]);
+				break;
+			}
+			case 'position':
+			{
+				getPosition($requestURI[5]);
+				break;
+			}
+			case 'update_activity':
+			{
+				//updateActivity($requestURI[5]);
+				echo "update activity";
+				break;
+			}
+			case 'place':
+			{
+				if (count($requestURI) == 10) {
+					placePiece($requestURI[6], $requestURI[5], $requestURI[7],$requestURI[8],$requestURI[9]);
+				} else  {
+					echo json_encode("Piece code or room id not provided.");
+				}
 				break;
 			}
 			default:
