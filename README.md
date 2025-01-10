@@ -1,12 +1,13 @@
 # ADISE24_blokus_2020038_2020074
 Blokus implementation by Michail Konstantinos Dimopoulos & Konstantinos Koufoudakis.
+[Live Demo](https://users.iee.ihu.gr/~iee2020038/login.html)
 
 ## features
 * Multiple players & games at the same time
 * Score counting & leaderboard
 * Fully-featured graphical UI
 * Inactivity detection & kicks
-* In-house account management
+* In-house user account management
 * No plaintext password storage
 
 There are some known issues that were not fixed due to time contraints. You'll find them in the issues tab.
