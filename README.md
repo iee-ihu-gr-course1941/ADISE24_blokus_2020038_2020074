@@ -12,6 +12,9 @@ Blokus implementation by Michail Konstantinos Dimopoulos & Konstantinos Koufouda
 
 There are some known issues that were not fixed due to time contraints. You'll find them in the issues tab.
 
+## Note
+Although the files are stored in the api directory, the front end files use API endpoints in a directory named lamp, as that is the name used in the live demo.
+
 # Game API Documentation
 
 A thin-API approached was followed to facilitate front-end development. This has led to some redundancy, but it has been minimized.
